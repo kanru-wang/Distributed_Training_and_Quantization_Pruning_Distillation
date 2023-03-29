@@ -1,1 +1,1 @@
-Quantization, Pruning, Knowledge Distillation and TFX pipeline
+Model Quantization, Pruning, Knowledge Distillation and TFX pipeline
