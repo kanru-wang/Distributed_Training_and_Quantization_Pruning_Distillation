@@ -91,3 +91,69 @@ https://www.coursera.org/learn/machine-learning-modeling-pipelines-in-production
   - An optimizer for the student and (optional) metrics to evaluate performance
 
 <img src="image/image012.png" width="950"/>
+
+<br>
+<br>
+
+## Distributed Training
+
+https://www.coursera.org/learn/custom-distributed-training-with-tensorflow
+
+## Multi-GPU Mirrored Strategy 
+
+    strategy = tf.distribute.MirroredStrategy()
+    
+    BATCH_SIZE_PER_REPLICA = 64
+    # With Mirrored Strategy, we have one replica per GPU device
+    # Each variable in the model is mirrored across all replicas
+    GLOBAL_BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
+    
+    # Create Distributed Datasets from the datasets
+    train_dataset = tf.data.Dataset...batch(GLOBAL_BATCH_SIZE)
+    test_dataset = tf.data.Dataset...batch(GLOBAL_BATCH_SIZE)
+    train_dist_dataset = strategy.experimental_distribute_dataset(train_dataset)
+    test_dist_dataset = strategy.experimental_distribute_dataset(test_dataset)
+    
+    # Instead of model.compile(), will do custom training within a strategy scope
+    # When defining the loss, set reduction to `none` so we can do the reduction afterwards (i.e. divide by global batch size).
+    with strategy.scope():
+        define loss
+        define how to aggregate (e.g. avg) the loss
+        define metric
+        define optimizer
+        define model structure
+    
+    # `per_replica_losses` is an array of losses, with each being the loss calculated on a replica.
+    # Distributed training step receives the losses from each of the replicas and then reduce them (in this case, sum).
+    # The summed loss is added to a cumulative total loss, which is then averaged, to become the training loss for this epoch.
+    @tf.function
+    def distributed_train_step(batch):
+        per_replica_losses = strategy.run(train_step, args=(batch,))
+        return strategy.reduce(
+            tf.distribute.ReduceOp.SUM,
+            per_replica_losses,
+            axis=None
+        )
+    
+    # train_step and test_step will be called `num_replicas_in_sync` times
+    def train_step(inputs):
+        ...normal code
+        ...use what's defined in with strategy.scope()
+    
+    @tf.function
+    def distributed_test_step(batch):
+        return strategy.run(test_step, args=(batch,))
+    
+    def test_step(inputs):
+        ...normal code
+        ...use what's defined in with strategy.scope()
+    
+    for each epoch:
+        for batch in train_dist_dataset:
+            total_loss += distributed_train_step(batch)
+            num_batches += 1
+        train_loss = total_loss / num_batches
+    
+        for batch in test_dist_dataset:
+            distributed_test_step(batch)
+        ...
