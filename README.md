@@ -101,6 +101,16 @@ https://www.coursera.org/learn/custom-distributed-training-with-tensorflow
 
 ## Multi-GPU Mirrored Strategy 
 
+How does `tf.distribute.MirroredStrategy` strategy work?
+
+- All the variables and the model graph are replicated on the replicas.
+- Input is evenly distributed across the replicas.
+- Each replica calculates the loss and gradients for the input it received.
+- The gradients are synced across all the replicas by summing them.
+- After the sync, the same update is made to the copies of the variables on each replica.
+
+The Multi Worker Mirrored Strategy uses multiple machines, but the Mirrored Strategy and TPU strategy use a single machine.
+
     strategy = tf.distribute.MirroredStrategy()
     
     BATCH_SIZE_PER_REPLICA = 64
