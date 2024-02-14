@@ -1,3 +1,9 @@
+### View [this nbviewer repository](https://nbviewer.org/github/kanru-wang/Distributed_Training_and_Quantization_Pruning_Distillation) if you have problem viewing the notebooks.
+
+--------------------------------
+
+<br>
+
 ## Model Quantization, Pruning, Knowledge Distillation and TFX pipeline
 
 https://www.coursera.org/learn/machine-learning-modeling-pipelines-in-production
