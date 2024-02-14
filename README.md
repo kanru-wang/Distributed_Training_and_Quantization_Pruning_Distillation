@@ -1,4 +1,4 @@
-### View [this nbviewer mirrored repository](https://nbviewer.org/github/kanru-wang/Distributed_Training_and_Quantization_Pruning_Distillation) if you have problem viewing the notebooks.
+### View [this nbviewer mirrored repository](https://nbviewer.org/github/kanru-wang/Distributed_Training_and_Quantization_Pruning_Distillation), if you see formatting issues in the notebooks above.
 
 --------------------------------
 
